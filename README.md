@@ -1,3 +1,6 @@
+**!!! Work in Progress !!!**
+
+
 This repo demonstrates that how weak 'Reset Password Codes' 
 can be guessed easily using selenium. 
 This poses a special problem that knowing the 
@@ -27,5 +30,7 @@ Obviously it will take some days or may be weaks but its possible.
 1. Use 2FA.
 2. Audit your Password Reset Mechanism from security perspective. Developers some times are too lazy to implement good security on this end.
 
+# TODO
+- Video Demonstration on how the attack works
 
 # Don't be a jerk by using this script for any malicious intent.
